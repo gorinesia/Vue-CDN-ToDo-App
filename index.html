@@ -1,0 +1,114 @@
+<script src="https://cdn.jsdelivr.net/npm/vue@2.5.16/dist/vue.js"></script>
+
+<div id="app">
+  <h1>ToDoリスト</h1>
+  <label>ジャンル</label>
+  <select v-model="selectedGenre">
+    <option v-for="genre in genres" :value="genre">{{ genre }}</option>
+  </select>
+  <br><br>
+  <label for="">タスク</label>
+  <textarea v-model="task"></textarea>
+  <br><br>
+  <button @click="addTask" :class="{ inactive: isBlank }">追加</button>
+  <hr>
+  <task-component
+    v-for="(task, index) in taskList"
+    v-bind:taskname="task.taskname"
+    v-bind:date="task.date"
+    v-bind:genre="task.genre"
+    v-bind:index="index"
+  ></task-component>
+</div>
+
+<script>
+  Vue.component('task-component', {
+    props:['taskname', 'date', 'genre', 'index'],
+    template:`
+      <div class="taskarea">
+        <div :class="{'completed': isCompleted}">
+        ジャンル：{{ genre }}
+        <br>タスクネーム：{{ taskname}}
+        <br>投稿日時：{{ date}}
+      </div>
+      <br><button v-on:click="deleteTask(Number(index))">削除</button>
+      <button v-on:click="isCompleted=true">完了</button>
+      <button v-on:click="isCompleted=false">完了取消</button>
+      </div>`,
+    data: function() {
+      return {
+        isCompleted: false
+      }
+    },
+    methods: {
+      deleteTask: function(index) {
+        this.$root.taskList.splice(index, 1);
+      }
+    }
+  })
+
+  new Vue({
+    el: "#app",
+    data: {
+      genres: ['筋トレ', '英語', 'プログラミング'],
+      task: '',
+      selectedGenre: '',
+      taskList: []
+    },
+    computed: {
+      isBlank: function() {
+        return this.task === '' || this.selectedGenre === ''
+      }
+    },
+    methods: {
+      addTask: function() {
+        const day = new Date();
+        this.taskList.push({
+          'taskname': this.task,
+          'genre': this.selectedGenre,
+          'date': day.toLocaleString('ja-JP')
+        });
+        this.task='';
+      }
+    }
+  })
+</script>
+
+<style>
+  .inActive {
+    pointer-events: none;
+    color: gray;
+  }
+
+  .taskarea {
+    margin-left: 10px;
+    margin-bottom: 10px;
+    /* background-color: #fafad2; */
+    background-color: teal;
+    padding: 10px 10px 10px 10px;
+  }
+
+  .completed {
+    text-decoration: line-through;
+  }
+</style>
+
+<!-- <!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+<body>
+  <div id="app">
+    <input v-model="text1">
+    <p>text1：{{ text1 }}</p>
+    <input v-model="text2">
+    <p>text2：{{ text2 }}</p>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+  <script src="main.js"></script>
+</body>
+</html>
